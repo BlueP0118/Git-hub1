@@ -1,0 +1,154 @@
+#include <stdio.h>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+vector<string> keyword = {"char", "double", "enum", "float", "int", "long",
+                          "short", "signed", "struct", "union", "unsigned", "void", "for",
+                          "do", "while", "break", "continue", "if", "else", "goto", "switch",
+                          "case", "default", "return", "auto", "extern", "register", "static",
+                          "const", "sizeof", "typedef", "volatile"
+                         };
+
+void level_1(vector <string> s) {
+	int total_num = 0;
+	for (int i = 0; i < int(s.size()); i++) {
+		for (int j = 0; j < 32; j++) {
+			if (s[i] == keyword[j])
+				total_num++;
+		}
+	}
+	cout << "total num: " << total_num << endl;
+}
+void level_2(vector <string> s) {
+	int switch_num = 0;
+	int case_num = 0;
+	vector <int> case1;
+	for (int i = 0; i < int(s.size()); i++) {
+		if (s[i] == "switch") {
+			switch_num += 1;
+			for (int j = i + 1; j < int(s.size()); j++) {
+
+				if (s[j] == "case") {
+					case_num += 1;
+				} else if (s[j] == "switch" ) {
+					i = j - 1;
+					case1.push_back(case_num);
+					case_num = 0;
+					break;
+				} else if (j == int(s.size() - 1)) {
+					i = j;
+					case1.push_back(case_num);
+					break;
+				}
+			}
+		}
+	}
+	cout << "switch num: " << switch_num << endl;
+	cout << "case num: ";
+	for (int i = 0; i < (int)case1.size(); i++) {
+		cout << case1[i] << " ";
+	}
+	cout << endl;
+}
+void level_3(vector <string> s) {
+	int if_else_num = 0;
+	int if_elseif_else_num = 0;
+	bool c = true;//Check if the following content is else if or if
+	for (int i = 0; i < (int)s.size(); i++) {
+		if (s[i] == "if") {
+			for (int j = i + 1; j < (int)s.size(); j++) {
+				if (s[j] == "if") {
+					i = j;
+				} else if (s[j] == "else" && s[j + 2] == "if") {
+					if (c == true)
+						c = false;
+				} else if (s[j] == "else" && s[j + 2] != "if") {
+					if (c == true)
+						if_else_num++;
+					else if (c == false)
+						if_elseif_else_num++;
+				}
+			}
+		}
+	}
+	cout << "if-else num: " << if_else_num << endl;
+}
+void level_4(vector <string> s) {
+	int if_else_num = 0;
+	int if_elseif_else_num = 0;
+	bool c = true;//Check if the following content is else if or if
+	for (int i = 0; i < (int)s.size(); i++) {
+		if (s[i] == "if") {
+			for (int j = i + 1; j < (int)s.size(); j++) {
+				if (s[j] == "if") {
+					i = j;
+				} else if (s[j] == "else" && s[j + 2] == "if") {
+					if (c == true)
+						c = false;
+				} else if (s[j] == "else" && s[j + 2] != "if") {
+					if (c == true)
+						if_else_num++;
+					else if (c == false)
+						if_elseif_else_num++;
+				}
+			}
+		}
+	}
+	cout << "if_elseif_else_num: " << if_elseif_else_num << endl;
+}
+int main() {
+	int level;
+	string filename;
+	ifstream inFile;
+	cout << "Please input the path of the code file:" << endl;
+	cin >> filename;
+	cout << "Please input the completion level(from 1 to 4):" << endl;
+	cin >> level;
+	inFile.open(filename.c_str());
+	if (inFile.fail()) {
+		cout << "The file can not open rightly" << endl;
+		exit(0);
+	}
+	vector <string> str;
+	string str1;
+	while (getline(inFile, str1)) {
+		int i = 1;
+		int j = 1;
+		while (i < int(str1.size()) && j < int(str1.size())) {
+			if (isalpha(str1[i])) {
+				if (!isalpha(str1[j] )) {
+					string s = str1.substr(i, j - i);
+					str.push_back(s);
+					i = j + 1;
+					j = i;
+				} else {
+					j++;
+				}
+			} else {
+				i++;
+				j = i;
+			}
+		}
+	}
+
+	if (level == 1) {
+		level_1(str);
+	}
+	if (level == 2) {
+		level_1(str);
+		level_2(str);
+	}
+	if (level == 3) {
+		level_1(str);
+		level_2(str);
+		level_3(str);
+	}
+	if (level == 4) {
+		level_1(str);
+		level_2(str);
+		level_3(str);
+		level_4(str);
+	}
+}
